@@ -5,18 +5,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { SortableTableHead } from "@/components/ui/sortable-table-head"
+import type { SortState } from "@/components/ui/sort-types"
 import { JobRow } from "@/components/JobRow"
 import type { JobListEntry } from "@/types"
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
 import { useState } from "react"
-
-type SortKey = "label" | "source" | "status" | "pid" | "last_run_at"
-type SortDirection = "asc" | "desc"
-
-type SortState = {
-  key: SortKey
-  direction: SortDirection
-}
 
 const sourceLabels: Record<JobListEntry["source"], string> = {
   UserAgent: "User",
@@ -24,13 +17,15 @@ const sourceLabels: Record<JobListEntry["source"], string> = {
   SystemDaemon: "Daemon",
 }
 
-function getSortValue(job: JobListEntry, key: SortKey): string | number | null {
+function getSortValue(job: JobListEntry, key: string): string | number | null {
   if (key === "source") return sourceLabels[job.source]
   if (key === "pid") return job.pid
   if (key === "last_run_at") {
     return job.last_run_at === null ? null : Number(job.last_run_at)
   }
-  return job[key]
+  if (key === "label") return job.label
+  if (key === "status") return job.status
+  return null
 }
 
 function compareJobs(firstJob: JobListEntry, secondJob: JobListEntry, sortState: SortState) {
@@ -47,47 +42,6 @@ function compareJobs(firstJob: JobListEntry, secondJob: JobListEntry, sortState:
       : String(firstValue).localeCompare(String(secondValue))
 
   return sortState.direction === "asc" ? comparison : -comparison
-}
-
-function SortIcon({ sortState, sortKey }: { sortState: SortState; sortKey: SortKey }) {
-  if (sortState.key !== sortKey) return <ArrowUpDown className="h-3.5 w-3.5" aria-hidden="true" />
-  return sortState.direction === "asc" ? (
-    <ArrowUp className="h-3.5 w-3.5" aria-hidden="true" />
-  ) : (
-    <ArrowDown className="h-3.5 w-3.5" aria-hidden="true" />
-  )
-}
-
-function SortableHeader({
-  label,
-  sortKey,
-  sortState,
-  onSort,
-}: {
-  label: string
-  sortKey: SortKey
-  sortState: SortState
-  onSort: (sortKey: SortKey) => void
-}) {
-  const isActive = sortState.key === sortKey
-  const direction = isActive
-    ? sortState.direction === "asc"
-      ? "ascending"
-      : "descending"
-    : "none"
-
-  return (
-    <button
-      type="button"
-      className="inline-flex h-8 items-center gap-1 rounded px-1 text-left hover:bg-muted"
-      onClick={() => onSort(sortKey)}
-      aria-label={`Sort by ${label}`}
-      aria-sort={direction}
-    >
-      {label}
-      <SortIcon sortState={sortState} sortKey={sortKey} />
-    </button>
-  )
 }
 
 type JobListProps = {
@@ -122,7 +76,7 @@ export function JobList({
     compareJobs(firstJob, secondJob, sortState)
   )
 
-  function handleSort(sortKey: SortKey) {
+  function handleSort(sortKey: string) {
     setSortState((currentSort) => ({
       key: sortKey,
       direction:
@@ -152,11 +106,11 @@ export function JobList({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead><SortableHeader label="Label" sortKey="label" sortState={sortState} onSort={handleSort} /></TableHead>
-          <TableHead className="w-24"><SortableHeader label="Source" sortKey="source" sortState={sortState} onSort={handleSort} /></TableHead>
-          <TableHead className="w-24"><SortableHeader label="Status" sortKey="status" sortState={sortState} onSort={handleSort} /></TableHead>
-          <TableHead className="w-16"><SortableHeader label="PID" sortKey="pid" sortState={sortState} onSort={handleSort} /></TableHead>
-          <TableHead className="w-24"><SortableHeader label="Last Run" sortKey="last_run_at" sortState={sortState} onSort={handleSort} /></TableHead>
+          <SortableTableHead label="Label" sortKey="label" sortState={sortState} onSort={handleSort} />
+          <SortableTableHead label="Source" sortKey="source" sortState={sortState} onSort={handleSort} className="w-24" />
+          <SortableTableHead label="Status" sortKey="status" sortState={sortState} onSort={handleSort} className="w-24" />
+          <SortableTableHead label="PID" sortKey="pid" sortState={sortState} onSort={handleSort} className="w-16" />
+          <SortableTableHead label="Last Run" sortKey="last_run_at" sortState={sortState} onSort={handleSort} className="w-24" />
           <TableHead className="w-28">Actions</TableHead>
         </TableRow>
       </TableHeader>
