@@ -10,7 +10,7 @@ dependencies:
     version: 4.3.3(vite@7.3.6)
   '@tauri-apps/api':
     specifier: ^2.10.1
-    version: 2.11.1
+    version: 2.10.1
   class-variance-authority:
     specifier: ^0.7.1
     version: 0.7.1
@@ -2796,8 +2796,8 @@ packages:
       vite: 7.3.6(@types/node@24.13.3)
     dev: false
 
-  /@tauri-apps/api@2.11.1:
-    resolution: {integrity: sha512-M2FPuYND2m+wh5hfW9ZpSdxMPdEJovPBWwoHJmwUpysTYNHaOkVFN419m/K0LIgjb/7KU2vBgsUepJWugQCvAA==}
+  /@tauri-apps/api@2.10.1:
+    resolution: {integrity: sha512-hKL/jWf293UDSUN09rR69hrToyIXBb8CjGaWC7gfinvnQrBVvnLr08FeFi38gxtugAVyVcTa5/FD/Xnkb1siBw==}
     dev: false
 
   /@tauri-apps/cli-darwin-arm64@2.11.4:
